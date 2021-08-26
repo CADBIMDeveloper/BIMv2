@@ -18,6 +18,7 @@ using Autodesk.Revit.UI.Selection;
 
 namespace BIMv2
 {
+    [Transaction(TransactionMode.Manual)]
     class WriteNameRoomInPlumbingFixtures: IExternalCommand
     {
         Application _app;
@@ -52,8 +53,6 @@ namespace BIMv2
         private void WriteNameRoomInPlumbingFixturesMethod()
         {
             ListInstances();
-
-
         }
 
         public void ListInstances()

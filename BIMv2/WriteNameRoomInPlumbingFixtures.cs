@@ -36,7 +36,8 @@ namespace BIMv2
             using (Transaction t = new Transaction(_doc))
             {
                 t.Start("Select all plumbing fixtures");
-                WriteNameRoomInPlumbingFixturesMethod();
+                WriteNameRoomInElementMethod();
+
                 TaskDialog.Show("У тебя получилось", "Ты красавчик!☺☺☺");
                 t.Commit();
 
@@ -49,38 +50,77 @@ namespace BIMv2
             return Result.Succeeded;
         }
 
-        private void WriteNameRoomInPlumbingFixturesMethod()
+        private void WriteNameRoomInElementMethod()
         {
             string nameRoom = "";
 
-            IList<Element> plFixList = GetAllPlumbingFixtures();
+            IList<Element> allElements = GetAllElements();
 
-            for (int i = 0; i < plFixList.Count; i++)
+            for (int i = 0; i < allElements.Count; i++)
             {
-               Location loc = plFixList[i].Location;
+               Location loc = allElements[i].Location;
                
                LocationPoint locPoint = (LocationPoint)loc;
                XYZ pointPF = locPoint.Point;
 
                Room myRoom = _doc.GetRoomAtPoint(pointPF);
-               nameRoom = myRoom.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString()+" "+
-                          myRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
 
-               //Parameter p = plFixList[i].get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"));
-
-               plFixList[i].get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5")).Set(nameRoom).ToString();
-
+               if (myRoom == null)
+               { 
+                   nameRoom = "не в помещении";
+                   allElements[i].get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"))
+                       .Set(nameRoom).ToString();
+                   
+               }
+               else
+               {
+                   nameRoom = myRoom.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString() + " " +
+                              myRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
+                   
+                   allElements[i].get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"))
+                       .Set(nameRoom).ToString();
+                }
             }
             
         }
 
-        public IList<Element> GetAllPlumbingFixtures()
+        public IList<Element> GetAllElements()
         {
             // List all plumbing fixtures
             var plumbingFixCollector = new FilteredElementCollector(_doc).OfClass(typeof(FamilyInstance));
             plumbingFixCollector.OfCategory(BuiltInCategory.OST_PlumbingFixtures);
             IList<Element> plFixList = plumbingFixCollector.ToElements();
 
+            // List all generic
+            var genericCollector = new FilteredElementCollector(_doc).OfClass(typeof(FamilyInstance));
+            genericCollector.OfCategory(BuiltInCategory.OST_GenericModel);
+            IList<Element> plFixList2 = genericCollector.ToElements();
+
+            foreach (var VARIABLE in plFixList2)
+            {
+                plFixList.Add(VARIABLE);
+            }
+
+            // List all SE
+            var seCollector = new FilteredElementCollector(_doc).OfClass(typeof(FamilyInstance));
+            seCollector.OfCategory(BuiltInCategory.OST_SpecialityEquipment);
+            IList<Element> plFixList3 = seCollector.ToElements();
+
+            foreach (var VARIABLE in plFixList3)
+            {
+                plFixList.Add(VARIABLE);
+            }
+
+            // List all furniture
+            var fCollector = new FilteredElementCollector(_doc).OfClass(typeof(FamilyInstance));
+            fCollector.OfCategory(BuiltInCategory.OST_Furniture);
+            IList<Element> plFixList4 = fCollector.ToElements();
+
+            foreach (var VARIABLE in plFixList4)
+            {
+                plFixList.Add(VARIABLE);
+            }
+            
             return plFixList;
         }
     }

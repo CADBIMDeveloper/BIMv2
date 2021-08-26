@@ -1,19 +1,12 @@
 ﻿#region Namespace
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
-
-
 #endregion
 
 namespace BIMv2
@@ -67,7 +60,7 @@ namespace BIMv2
 
                if (myRoom == null)
                { 
-                   nameRoom = "не в помещении";
+                   nameRoom = "It's not in Room";
                    allElements[i].get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"))
                        .Set(nameRoom).ToString();
                    

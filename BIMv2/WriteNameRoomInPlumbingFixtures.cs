@@ -63,11 +63,11 @@ namespace BIMv2
                XYZ pointPF = locPoint.Point;
 
                Room myRoom = _doc.GetRoomAtPoint(pointPF);
-               nameRoom = myRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
+               nameRoom = myRoom.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString()+" "+
+                          myRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
                plFixList[i].get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(nameRoom);
             }
             
-
         }
 
         public IList<Element> GetAllPlumbingFixtures()

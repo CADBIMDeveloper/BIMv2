@@ -32,8 +32,7 @@ namespace BIMv2
             _app = uiApp.Application;
             _doc = uiDoc.Document;
             creApp = commandData.Application.Application.Create;
-
-
+            
             using (Transaction t = new Transaction(_doc))
             {
                 t.Start("Select all plumbing fixtures");
@@ -52,20 +51,25 @@ namespace BIMv2
 
         private void WriteNameRoomInPlumbingFixturesMethod()
         {
-            ListInstances();
+            IList<Element> plFixList=GetAllPlumbingFixtures();
+
+            TaskDialog.Show("My Dialog Title", "Hello World!");
+
         }
 
-        public void ListInstances()
+        public IList<Element> GetAllPlumbingFixtures()
         {
-            // List all the door instances 
+            // List all plumbing fixtures
             var plumbingFixCollector = new FilteredElementCollector(_doc).OfClass(typeof(FamilyInstance));
             plumbingFixCollector.OfCategory(BuiltInCategory.OST_PlumbingFixtures);
             IList<Element> plFixList = plumbingFixCollector.ToElements();
 
-            ShowElementList(plFixList, "Plumbing Fixtured: ");
+            return plFixList;
+
+            //ShowElementList(plFixList, "Plumbing Fixtured: ");
         }
 
-        public void ShowElementList(IList<Element> elems, string header)
+       /* public void ShowElementList(IList<Element> elems, string header)
         {
             string s = " - Class - Category - Name (or Family: Type Name) - Id - \r\n";
             foreach (Element e in elems)
@@ -100,5 +104,5 @@ namespace BIMv2
                                     + name + "; "
                                     + e.Id.IntegerValue.ToString() + "\r\n";
         }
-    }
+   */ }
 }

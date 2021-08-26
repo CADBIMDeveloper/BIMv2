@@ -65,7 +65,11 @@ namespace BIMv2
                Room myRoom = _doc.GetRoomAtPoint(pointPF);
                nameRoom = myRoom.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString()+" "+
                           myRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
-               plFixList[i].get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(nameRoom);
+
+               //Parameter p = plFixList[i].get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"));
+
+               plFixList[i].get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5")).Set(nameRoom).ToString();
+
             }
             
         }

@@ -51,9 +51,22 @@ namespace BIMv2
 
         private void WriteNameRoomInPlumbingFixturesMethod()
         {
-            IList<Element> plFixList=GetAllPlumbingFixtures();
+            string nameRoom = "";
 
-            TaskDialog.Show("My Dialog Title", "Hello World!");
+            IList<Element> plFixList = GetAllPlumbingFixtures();
+
+            for (int i = 0; i < plFixList.Count; i++)
+            {
+               Location loc = plFixList[i].Location;
+               
+               LocationPoint locPoint = (LocationPoint)loc;
+               XYZ pointPF = locPoint.Point;
+
+               Room myRoom = _doc.GetRoomAtPoint(pointPF);
+               nameRoom = myRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
+               plFixList[i].get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(nameRoom);
+            }
+            
 
         }
 
@@ -65,44 +78,6 @@ namespace BIMv2
             IList<Element> plFixList = plumbingFixCollector.ToElements();
 
             return plFixList;
-
-            //ShowElementList(plFixList, "Plumbing Fixtured: ");
         }
-
-       /* public void ShowElementList(IList<Element> elems, string header)
-        {
-            string s = " - Class - Category - Name (or Family: Type Name) - Id - \r\n";
-            foreach (Element e in elems)
-            {
-                s += ElementToString(e);
-            }
-            TaskDialog.Show(header + "(" + elems.Count.ToString() + "):", s);
-        }
-        public string ElementToString(Element e)
-        {
-            if (e == null)
-            {
-                return "none";
-            }
-
-            string name = "";
-
-            if (e is ElementType)
-            {
-                Parameter param = e.get_Parameter(BuiltInParameter.SYMBOL_FAMILY_AND_TYPE_NAMES_PARAM);
-                if (param != null)
-                {
-                    name = param.AsString();
-                }
-            }
-            else
-            {
-                name = e.Name;
-            }
-            return e.GetType().Name + "; "
-                                    + e.Category.Name + "; "
-                                    + name + "; "
-                                    + e.Id.IntegerValue.ToString() + "\r\n";
-        }
-   */ }
+    }
 }

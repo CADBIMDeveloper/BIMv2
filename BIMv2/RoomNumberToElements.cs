@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
@@ -27,8 +28,7 @@ namespace BIMv2
 
             var uiApp = commandData.Application;
             var uiDoc = uiApp.ActiveUIDocument;
-
-
+            
             _app = uiApp.Application;
             _doc = uiDoc.Document;
 
@@ -55,14 +55,14 @@ namespace BIMv2
 
             // (4) first parameters.
 
-            ShowParameters(elem, "Element Parameters: ");
+            //ShowParameters(elem, "Element Parameters: ");
 
             // Check to see its type parameter as well
 
             ElementId elemTypeId = elem.GetTypeId();
 
             ElementType elemType = (ElementType)_doc.GetElement(elemTypeId); // since 2013
-            ShowParameters(elemType, "Type Parameters: ");
+            //ShowParameters(elemType, "Type Parameters: ");
 
             // Okay. we saw a set or parameters for a given element or element type.
             // How can we access to each parameters. For example, how can we get the value of "length" information?
@@ -73,7 +73,7 @@ namespace BIMv2
             //RetrieveParameter(elemType, "Type Parameter (by Name and BuiltInParameter): ");
 
             // (5) location
-            //ShowLocation(elem);
+            ShowLocation(elem);
 
             // (6) geometry - the last piece. (Optional)
             //ShowGeometry(elem);
@@ -331,6 +331,7 @@ namespace BIMv2
         {
             string s = "Location Information: " + "\n" + "\n";
             Location loc = e.Location;
+            string sg="";
 
             if (loc is LocationPoint)
             {
@@ -338,11 +339,23 @@ namespace BIMv2
 
                 LocationPoint locPoint = (LocationPoint)loc;
                 XYZ pt = locPoint.Point;
+
+                Room myRoom = _doc.GetRoomAtPoint(pt);
+                if (myRoom == null)
+                {
+                    sg = "нету";
+                }
+                else
+                {
+                    sg = myRoom.Name.ToString();
+                }
+
                 double r = locPoint.Rotation;
 
                 s += "LocationPoint" + "\n";
                 s += "Point = " + PointToString(pt) + "\n";
-                s += "Rotation = " + r.ToString() + "\n";
+                //s += "Rotation = " + r.ToString() + "\n";
+                s += "Room = " + sg + "\n";
             }
             else if (loc is LocationCurve)
             {
@@ -456,14 +469,6 @@ namespace BIMv2
             return str;
         }
 
-        //public void SetElement(Element e)
-        //{
-
-        //    e.set_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set("API");
-
-
-
-        //}
     }
 }
 

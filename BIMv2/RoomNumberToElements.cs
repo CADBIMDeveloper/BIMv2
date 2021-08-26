@@ -46,7 +46,7 @@ namespace BIMv2
             // SetElement(elem);
 
 
-            ShowBasicElementInfo(elem);
+            //ShowBasicElementInfo(elem);
 
             // (3) now, we are going to identify each major types of element.
             //IdentifyElement(elem);
@@ -347,13 +347,13 @@ namespace BIMv2
                 }
                 else
                 {
-                    sg = myRoom.Name.ToString();
+                    sg = myRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
                 }
 
                 double r = locPoint.Rotation;
 
-                s += "LocationPoint" + "\n";
-                s += "Point = " + PointToString(pt) + "\n";
+                //s += "LocationPoint" + "\n";
+                //s += "Point = " + PointToString(pt) + "\n";
                 //s += "Rotation = " + r.ToString() + "\n";
                 s += "Room = " + sg + "\n";
             }

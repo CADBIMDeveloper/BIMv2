@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+	<AddIn Type="Application">
+		<Name>SampleApplication</Name>
+		<Assembly>BIMv2Buttons.dll</Assembly>
+		<AddInId>604b1052-f742-4951-8576-c271d1993108</AddInId>
+		<FullClassName>BIMv2Buttons.App</FullClassName>
+		<VendorId>D</VendorId>
+		<VendorDescription>2bimRU http://www.2bim.ru</VendorDescription>
+	</AddIn>
+</RevitAddIns>

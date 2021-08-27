@@ -56,7 +56,6 @@ namespace BIMv2
 
                 var locPoint = (LocationPoint)loc;
                 var pointPF = locPoint.Point;
-
                 var myRoom = _doc.GetRoomAtPoint(pointPF);
 
                 var nameRoom = "";

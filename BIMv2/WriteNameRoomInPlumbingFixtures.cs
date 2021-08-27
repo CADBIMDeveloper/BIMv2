@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
 #endregion
@@ -12,7 +13,7 @@ using Autodesk.Revit.UI;
 namespace BIMv2
 {
     [Transaction(TransactionMode.Manual)]
-    internal class WriteNameRoomInPlumbingFixtures : IExternalCommand
+    public class WriteNameRoomInPlumbingFixtures : IExternalCommand
     {
         private Application _app;
         private Document _doc;
@@ -44,45 +45,43 @@ namespace BIMv2
             return Result.Succeeded;
         }
 
-        private void WriteNameRoomInElementMethod()
+        public void WriteNameRoomInElementMethod()
         {
-            string nameRoom = "";
-
             var allElements = GetAllElements();
 
-            for (var i = 0; i < allElements.Count; i++)
+            foreach (var e in allElements)
             {
-                var loc = allElements[i].Location;
+                var loc = e.Location;
 
                 var locPoint = (LocationPoint)loc;
                 var pointPF = locPoint.Point;
 
                 var myRoom = _doc.GetRoomAtPoint(pointPF);
-                
-                if (myRoom == null)
-                {
-                    var linkedFilesMayBe = AllLinkedFiles();
-                    for (int j = 0; j < linkedFilesMayBe.Count; j++)
-                    {
-                        
-                        Document doc2 = linkedFilesMayBe[j].Document;
-                        var myRoom2 = doc2.GetRoomAtPoint(pointPF);
-                        if (myRoom2 != null)
-                        {
-                            nameRoom = myRoom2.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString() + " " +
-                                        myRoom2.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
-                        }
-                    }
-                    nameRoom = "It's not in Room";
-                    allElements[i].get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"))
-                        .Set(nameRoom).ToString();
-                }
-                else
+
+                var nameRoom = "";
+
+                if (myRoom != null)
                 {
                     nameRoom = myRoom.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString() + " " +
                                myRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
 
-                    allElements[i].get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"))
+                    e.get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"))
+                        .Set(nameRoom).ToString();
+                }
+                else
+                {
+                    IList<Element> doc2 = AllLinkedFiles(); // List all linked files
+
+                    Room myRoom2 = doc2[0].Document.GetRoomAtPoint(pointPF);
+
+                    //.document return mainModel, not link
+
+                    if (myRoom2 != null)
+                        nameRoom = myRoom2.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString() + " " +
+                                   myRoom2.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
+                    
+                    nameRoom = "It's not in Room";
+                    e.get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"))
                         .Set(nameRoom).ToString();
                 }
             }
@@ -121,12 +120,14 @@ namespace BIMv2
 
         public IList<Element> AllLinkedFiles()
         {
-            
-                // start by the root links (no parent node)
-                FilteredElementCollector coll = new FilteredElementCollector(_doc);
-                coll.OfClass(typeof(RevitLinkInstance));
-                var rvtLinked = coll.ToElements(); ;
-                return rvtLinked;
+            var coll = new FilteredElementCollector(_doc);
+            var elems = coll
+                .OfCategory(BuiltInCategory.OST_RvtLinks)
+                .OfClass(typeof(RevitLinkType))
+                .ToElements();
+            IList<Element> rvtLinked = elems;
+
+            return rvtLinked;
         }
     }
 }

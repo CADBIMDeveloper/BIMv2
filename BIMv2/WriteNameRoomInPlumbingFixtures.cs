@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -17,7 +18,8 @@ namespace BIMv2
     {
         private Application _app;
         private Document _doc;
-        
+        public ElementId linkDocId = new ElementId(BuiltInCategory.OST_RvtLinks);
+        public List<ElementId> roomids = new List<ElementId>();
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -25,13 +27,13 @@ namespace BIMv2
             var uiDoc = uiApp.ActiveUIDocument;
             _app = uiApp.Application;
             _doc = uiDoc.Document;
-           
+
 
             using (var t = new Transaction(_doc))
             {
                 t.Start("Select all plumbing fixtures");
 
-                WriteNameRoomInElementMethod();
+                WriteNameRoomInElementMethod(uiApp);
 
                 TaskDialog.Show("У тебя получилось", "Ты красавчик!☺☺☺");
                 t.Commit();
@@ -44,7 +46,7 @@ namespace BIMv2
             return Result.Succeeded;
         }
 
-        public void WriteNameRoomInElementMethod()
+        public void WriteNameRoomInElementMethod(UIApplication uiApp)
         {
             var allElements = GetAllElements();
 
@@ -69,17 +71,43 @@ namespace BIMv2
                 }
                 else
                 {
-                    IList<Element> doc2 = AllLinkedFiles(); // List all linked files
+                    var doc2 = AllLinkedFiles(); // List all linked files
 
-                    Room myRoom2 = doc2[0].Document.GetRoomAtPoint(pointPF); //return main doc
+                    for (var i = 0; i < doc2.Count; i++)
+                    {
+                        var egElement = doc2[i];
 
-                    if (myRoom2 != null)
-                        nameRoom = myRoom2.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString() + " " +
-                                   myRoom2.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
-                    
-                    nameRoom = "It's not in Room";
-                    e.get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"))
-                        .Set(nameRoom).ToString();
+                        var linkType = egElement as RevitLinkType;
+                        var linkName = string.Concat(linkType.Name.Reverse().Skip(4).Reverse());
+                        //Room myRoom2;
+
+                        foreach (Document linkedDoc in uiApp.Application.Documents)
+                            if (linkedDoc.Title.Equals(linkName))
+                            {
+                               var myRoom2 = linkedDoc.GetRoomAtPoint(pointPF);
+                               if (myRoom2 != null){
+                                   nameRoom = myRoom2.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString() + " " +
+                                              myRoom2.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
+                               } else
+                               {
+                                   nameRoom = "It's not in Room";
+                                   e.get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"))
+                                       .Set(nameRoom).ToString();
+                               }
+                               linkDocId = egElement.Id;
+                               var collLinked = new FilteredElementCollector(linkedDoc);
+                               var linkedRooms = collLinked
+                                   .OfClass(typeof(SpatialElement)).ToElements();
+                               if (linkedRooms != null)
+                                   foreach (var l in linkedRooms)
+                                       roomids.Add(l.Id);
+                               //return linkedDoc;
+                            }
+
+                        //var myRoom2 = doc2[0].Document.GetRoomAtPoint(pointPF); //return main doc
+                        
+                        
+                    }
                 }
             }
         }

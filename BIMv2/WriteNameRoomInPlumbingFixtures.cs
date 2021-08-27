@@ -17,7 +17,7 @@ namespace BIMv2
     {
         private Application _app;
         private Document _doc;
-        private Autodesk.Revit.Creation.Application creApp;
+        
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -25,8 +25,7 @@ namespace BIMv2
             var uiDoc = uiApp.ActiveUIDocument;
             _app = uiApp.Application;
             _doc = uiDoc.Document;
-            creApp = commandData.Application.Application.Create;
-
+           
 
             using (var t = new Transaction(_doc))
             {
@@ -72,9 +71,7 @@ namespace BIMv2
                 {
                     IList<Element> doc2 = AllLinkedFiles(); // List all linked files
 
-                    Room myRoom2 = doc2[0].Document.GetRoomAtPoint(pointPF);
-
-                    //.document return mainModel, not link
+                    Room myRoom2 = doc2[0].Document.GetRoomAtPoint(pointPF); //return main doc
 
                     if (myRoom2 != null)
                         nameRoom = myRoom2.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString() + " " +
@@ -125,7 +122,7 @@ namespace BIMv2
                 .OfCategory(BuiltInCategory.OST_RvtLinks)
                 .OfClass(typeof(RevitLinkType))
                 .ToElements();
-            IList<Element> rvtLinked = elems;
+            var rvtLinked = elems;
 
             return rvtLinked;
         }

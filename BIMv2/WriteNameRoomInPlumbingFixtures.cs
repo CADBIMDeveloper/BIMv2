@@ -46,7 +46,7 @@ namespace BIMv2
 
         private void WriteNameRoomInElementMethod()
         {
-            var nameRoom = "";
+            string nameRoom = "";
 
             var allElements = GetAllElements();
 
@@ -67,8 +67,11 @@ namespace BIMv2
                         
                         Document doc2 = linkedFilesMayBe[j].Document;
                         var myRoom2 = doc2.GetRoomAtPoint(pointPF);
-                        nameRoom = myRoom2.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString() + " " +
-                                   myRoom2.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
+                        if (myRoom2 != null)
+                        {
+                            nameRoom = myRoom2.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString() + " " +
+                                        myRoom2.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
+                        }
                     }
                     nameRoom = "It's not in Room";
                     allElements[i].get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"))

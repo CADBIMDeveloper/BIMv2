@@ -64,7 +64,7 @@ namespace BIMv2
                                    myRoom.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
 
                     e.get_Parameter(new Guid("c78f0a7d-b68b-4d21-a247-1c8c6ced8bc5"))
-                        .Set(nameRoom).ToString();
+                        .Set(nameRoom);
                 }
                 else
                 {
@@ -135,18 +135,6 @@ namespace BIMv2
                 .Cast<Phase>()
                 .Select(x => document.GetRoomAtPoint(point, x))
                 .FirstOrDefault(x => x != null);
-        }
-        
-        public IList<Element> AllLinkedFiles()
-        {
-            var coll = new FilteredElementCollector(_doc);
-            var elems = coll
-                .OfCategory(BuiltInCategory.OST_RvtLinks)
-                .OfClass(typeof(RevitLinkType))
-                .ToElements();
-            var rvtLinked = elems;
-
-            return rvtLinked;
         }
     }
 }

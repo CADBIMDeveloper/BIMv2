@@ -152,6 +152,15 @@ namespace BIMv2
                 .ToList();
         }
 
+        private static Room FindRoom(Document document, XYZ point)
+        {
+            return document
+                .Phases
+                .Cast<Phase>()
+                .Select(x => document.GetRoomAtPoint(point, x))
+                .FirstOrDefault(x => x != null);
+        }
+        
         public IList<Element> AllLinkedFiles()
         {
             var coll = new FilteredElementCollector(_doc);

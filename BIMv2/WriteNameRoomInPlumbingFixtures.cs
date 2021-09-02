@@ -142,6 +142,16 @@ namespace BIMv2
             return plFixList;
         }
 
+        private IEnumerable<RevitLinkInstance> FindLinkedInstances()
+        {
+            var collector = new FilteredElementCollector(_doc);
+
+            return collector
+                .OfClass(typeof(RevitLinkInstance))
+                .Cast<RevitLinkInstance>()
+                .ToList();
+        }
+
         public IList<Element> AllLinkedFiles()
         {
             var coll = new FilteredElementCollector(_doc);
